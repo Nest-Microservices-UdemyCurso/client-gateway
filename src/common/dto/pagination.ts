@@ -1,6 +1,8 @@
 import { Type } from "class-transformer"
-import { IsOptional, IsPositive } from "class-validator"
+import { IsEnum, IsOptional, IsPositive } from "class-validator"
 import { envs } from "src/config/envs"
+import { StatusDto } from "src/orders/dto"
+import { OrderStatus } from "src/orders/enum/order.enum"
 
 export class PaginationDto {
     
@@ -13,5 +15,9 @@ export class PaginationDto {
     @IsOptional()
     @Type(() => Number)
     limit: number = envs.limit
+
+    @IsEnum(OrderStatus, { message: `Possible status values are ${OrderStatus}` })    
+    @IsOptional()
+    status: StatusDto
 
 }

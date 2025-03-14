@@ -15,7 +15,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { PRODUCT_SERVICE } from 'src/config';
 import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { PaginationDto } from 'src/common/dto';
-import { catchError, firstValueFrom } from 'rxjs';
+import { catchError } from 'rxjs';
 
 @Controller('products')
 export class ProductsController {
@@ -34,8 +34,8 @@ export class ProductsController {
   }
 
   @Get(':id')
-  async getProduct( @Param('id', ParseIntPipe ) id: number ) {
-    return this.productsClient.send( 'get_product_by_id', { id } ).pipe(
+  async getProduct(@Param('id', ParseIntPipe) id: number) {
+    return this.productsClient.send('get_product_by_id', { id }).pipe(
       catchError((err) => {
         throw new RpcException(err);
       }),
@@ -47,14 +47,23 @@ export class ProductsController {
     @Param('id', ParseIntPipe) id: number,
     @Body() updateProductDto: UpdateProductDto,
   ) {
-    return this.productsClient.send('update_product_by_id', [
-      id,
-      updateProductDto,
-    ]);
+
+    return this.productsClient
+      .send('update_product_by_id', { id, ...updateProductDto } )
+      .pipe(
+        catchError((err) => {
+          console.error('Error al enviar al microservicio:', err);
+          throw new RpcException(err);
+        }),
+      );
   }
 
   @Delete(':id')
   deleteProduct(@Param('id', ParseIntPipe) id: number) {
-    return this.productsClient.send('delete_product_by_id', { id });
+    return this.productsClient.send('delete_product_by_id', { id }).pipe(
+      catchError((err) => {
+        throw new RpcException(err);
+      }),
+    );
   }
 }
