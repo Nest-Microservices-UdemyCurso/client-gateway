@@ -5,7 +5,6 @@ import {
   Body,
   Patch,
   Param,
-  Delete,
   Inject,
   ParseUUIDPipe,
   Query,
@@ -19,7 +18,7 @@ import { PaginationDto } from 'src/common/dto';
 @Controller('orders')
 export class OrdersController {
   constructor(
-    @Inject(NATS_SERVICE) private readonly ordersClient: ClientProxy,
+    @Inject( NATS_SERVICE ) private readonly ordersClient: ClientProxy,
   ) {}
 
   @Post()
@@ -33,7 +32,11 @@ export class OrdersController {
 
   @Get()
   findAll(@Query() paginationDto: PaginationDto) {
-    return this.ordersClient.send('find_all_orders', paginationDto);
+    return this.ordersClient.send('find_all_orders', paginationDto).pipe(
+      catchError((err) => {
+        throw new RpcException(err);
+      })
+    )
   }
 
   @Get(':id')

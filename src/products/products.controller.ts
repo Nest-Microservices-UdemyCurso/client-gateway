@@ -25,12 +25,20 @@ export class ProductsController {
 
   @Post()
   createProduct(@Body() createProductDto: CreateProductDto) {
-    return this.productsClient.send('create_product', createProductDto);
+    return this.productsClient.send('create_product', createProductDto).pipe(
+      catchError((err) => {
+        throw new RpcException(err);
+      }),
+    );
   }
 
   @Get()
   getProducts(@Query() paginationDto: PaginationDto) {
-    return this.productsClient.send('get_products', paginationDto);
+    return this.productsClient.send('get_products', paginationDto).pipe(
+      catchError((err) => {
+        throw new RpcException(err);
+      }),
+    );
   }
 
   @Get(':id')
@@ -47,9 +55,8 @@ export class ProductsController {
     @Param('id', ParseIntPipe) id: number,
     @Body() updateProductDto: UpdateProductDto,
   ) {
-
     return this.productsClient
-      .send('update_product_by_id', { id, ...updateProductDto } )
+      .send('update_product_by_id', { id, ...updateProductDto })
       .pipe(
         catchError((err) => {
           console.error('Error al enviar al microservicio:', err);
