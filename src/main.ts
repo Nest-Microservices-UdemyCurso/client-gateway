@@ -15,11 +15,14 @@ async function bootstrap() {
       whitelist: true,
       forbidNonWhitelisted: true,
     }),
-  );
-
+  );  
+  
   app.useGlobalFilters( new RpcCustomExceptionFilter )
-
+  
   await app.listen(envs.port);
+
+  console.log('Hola mundo, como estan?');
+  
   logger.log('Server running on port', envs.port);
 }
 bootstrap();
